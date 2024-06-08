@@ -1,39 +1,34 @@
-#define OLC_PGE_APPLICATION
-#include "olcPixelGameEngine.h"
+#include "tgaimage.h"
 
-class Example : public olc::PixelGameEngine
+const TGAColor white = TGAColor(255, 255, 255, 255);
+const TGAColor red = TGAColor(255, 0, 0, 255);
+
+// Bresenham's Line Algorithm
+void line(int x0, int y0, int x1, int y1, TGAImage &image, TGAColor color)
 {
-public:
-    Example()
-    {
-        sAppName = "Example";
+
+    float err = .5;
+    float delta_x = x1 - x0;
+    float delta_y = y1 - y0;
+    float m = delta_y / delta_x; // this is our slope
+    while (x0 < x1)
+    { // Loop through all the x coordinates
+        image.set(x0, y0, white);
+        x0 += 1;  // step x to the right
+        err += m; // Error equals the slope
+        if (err > .5)
+        {
+            y0 += 1;
+            err -= 1;
+        }
     }
+}
 
-public:
-    bool OnUserCreate() override
-    {
-        // Called once at the start, so create things here
-        return true;
-    }
-
-    bool OnUserUpdate(float fElapsedTime) override
-    {
-        Clear(olc::BLACK);
-        // called once per frame
-        for (int x = 0; x < ScreenWidth(); x++)
-            for (int y = 0; y < ScreenHeight(); y++)
-                Draw(x, y, olc::Pixel(rand() % 255, rand() % 255, rand() % 255));
-
-        FillRect(GetMouseX(), GetMouseY(), 1, 1);
-        return true;
-    }
-};
-
-int main(int argc, char const *argv[])
+int main(int argc, char **argv)
 {
-    Example demo;
-    if (demo.Construct(15, 10, 32, 32))
-        demo.Start();
-
+    TGAImage image(100, 100, TGAImage::RGB);
+    line(13, 20, 80, 250, image, white);
+    image.flip_vertically(); // i want to have the origin at the left bottom corner of the image
+    image.write_tga_file("output.tga");
     return 0;
 }

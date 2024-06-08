@@ -1,18 +1,22 @@
-CXX = clang++
-CXXFLAGS = -arch arm64 -std=c++17 -mmacosx-version-min=10.15 -Wall
-FRAMEWORKS = -framework OpenGL -framework GLUT -framework Carbon
-INCLUDES = -I/opt/homebrew/include
-LIBS = -L/opt/homebrew/lib -lpng
+SYSCONF_LINK = g++
+CPPFLAGS     =
+LDFLAGS      =
+LIBS         = -lm
 
-TARGET = output
-SOURCES = main.cpp
+DESTDIR = ./
+TARGET  = main
 
-.PHONY: all clean
+OBJECTS := $(patsubst %.cpp,%.o,$(wildcard *.cpp))
 
-all: $(TARGET)
+all: $(DESTDIR)$(TARGET)
 
-$(TARGET): $(SOURCES)
-	$(CXX) $(CXXFLAGS) $(FRAMEWORKS) $(INCLUDES) $(LIBS) $^ -o $@
+$(DESTDIR)$(TARGET): $(OBJECTS)
+	$(SYSCONF_LINK) -Wall $(LDFLAGS) -o $(DESTDIR)$(TARGET) $(OBJECTS) $(LIBS)
+
+$(OBJECTS): %.o: %.cpp
+	$(SYSCONF_LINK) -Wall $(CPPFLAGS) -c $(CFLAGS) $< -o $@
 
 clean:
-	rm -f $(TARGET)
+	-rm -f $(OBJECTS)
+	-rm -f $(TARGET)
+	-rm -f *.tga
